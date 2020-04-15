@@ -4,7 +4,8 @@ from BinarySystem import *
 import os
 
 class MonteCarlo:
-    def __init__(self,Np=1,SimNum=0):
+    def __init__(self,Np=1,SimNum=0,Path='Res/'):
+        self.Path=Path
         self.Success=0
         self.Refuse=0
         self.DEP,self.DEN=0,0
@@ -15,10 +16,10 @@ class MonteCarlo:
         self.Moved=list()
         self.Np=Np
         self.SimNum=SimNum
-        with open('Res/Sim'+str(self.SimNum)+'/Stat.out','w') as myfile:
+        with open(self.Path+'Sim'+str(self.SimNum)+'/Stat.out','w') as myfile:
             myfile.write('time Beta AcceptanceRate RefusalRate Nmove Radius\n')
-        with open('Res/Sim'+str(self.SimNum)+'/AdvanceStat.out','w') as myfile:
-            myfile.write('time Beta PositiveDERate NegativeDERate AcceptedPositiveDERate averageDE\n')
+        with open(self.Path+'Sim'+str(self.SimNum)+'/AdvanceStat.out','w') as myfile:
+            myfile.write('time Beta PositiveDERate NegativeDERate AcceptedPositiveDERate average_Positive_DE\n')
     def McMove(self,BinSyst):
         self.Moved.clear()
         for _ in range(1):#self.Nmove):
@@ -47,21 +48,25 @@ class MonteCarlo:
     def MakeStat(self,time,Beta):
         Ntot=self.Success+self.Refuse
         #DEPArate=self.DEPA/Ntot
-        self.DEPArate=self.DEPA/self.DEP
+        if self.DEP!=0:
+            self.DEPArate=self.DEPA/self.DEP
+            self.avDE=self.DE/self.DEP
+        else :
+            self.DEPArate=0.
+            self.avDE=0.
         DEPrate=self.DEP/Ntot
         DENrate=self.DEN/Ntot
-        self.avDE=self.DE/self.DEP
         RefusalRate=self.Refuse/Ntot
-        AcceptanceRate=self.Success/Ntot
-        with open('Res/Sim'+str(self.SimNum)+'/Stat.out','a') as myfile:
-            myfile.write(str(time)+' '+str(Beta)+' '+str(AcceptanceRate)+' '+str(RefusalRate)+' ')
+        self.AcceptanceRate=self.Success/Ntot
+        with open(self.Path+'Sim'+str(self.SimNum)+'/Stat.out','a') as myfile:
+            myfile.write(str(time)+' '+str(Beta)+' '+str(self.AcceptanceRate)+' '+str(RefusalRate)+' ')
             myfile.write(str(self.Nmove)+' '+str(self.radius)+'\n')
-        with open('Res/Sim'+str(self.SimNum)+'/AdvanceStat.out','a') as myfile:
+        with open(self.Path+'Sim'+str(self.SimNum)+'/AdvanceStat.out','a') as myfile:
             myfile.write(str(time)+' '+str(Beta)+' '+str(DEPrate)+' '+str(DENrate)+' '+str(self.DEPArate))
             myfile.write(' '+str(self.avDE)+'\n')
-        if AcceptanceRate > 0.6:
+        if self.AcceptanceRate > 0.6:
             self.Harder()
-        elif AcceptanceRate < 0.3 :
+        elif self.AcceptanceRate < 0.3 :
             self.Softer()
         self.DE,self.DEN,self.DEP,self.DEPA=0,0,0,0
         self.Success=0

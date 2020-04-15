@@ -29,8 +29,9 @@ class MonteCarlo:
         for site in reversed(self.Moved):
             BinSyst.ReverseMove(site[0],site[1],site[2],site[3])
     def Count(self,Success,DE=0):
-        self.DE+=abs(DE)
+        #self.DE+=abs(DE)
         if DE>0:
+            self.DE+=DE
             self.DEP+=1
         else:
             self.DEN+=1
@@ -45,18 +46,19 @@ class MonteCarlo:
             self.DEPA+=1        
     def MakeStat(self,time,Beta):
         Ntot=self.Success+self.Refuse
+        #DEPArate=self.DEPA/Ntot
+        self.DEPArate=self.DEPA/self.DEP
         DEPrate=self.DEP/Ntot
         DENrate=self.DEN/Ntot
-        DEPArate=self.DEPA/Ntot
-        avDE=self.DE/Ntot
+        self.avDE=self.DE/self.DEP
         RefusalRate=self.Refuse/Ntot
         AcceptanceRate=self.Success/Ntot
         with open('Res/Sim'+str(self.SimNum)+'/Stat.out','a') as myfile:
             myfile.write(str(time)+' '+str(Beta)+' '+str(AcceptanceRate)+' '+str(RefusalRate)+' ')
             myfile.write(str(self.Nmove)+' '+str(self.radius)+'\n')
         with open('Res/Sim'+str(self.SimNum)+'/AdvanceStat.out','a') as myfile:
-            myfile.write(str(time)+' '+str(Beta)+' '+str(DEPrate)+' '+str(DENrate)+' '+str(DEPArate))
-            myfile.write(' '+str(avDE)+'\n')
+            myfile.write(str(time)+' '+str(Beta)+' '+str(DEPrate)+' '+str(DENrate)+' '+str(self.DEPArate))
+            myfile.write(' '+str(self.avDE)+'\n')
         if AcceptanceRate > 0.6:
             self.Harder()
         elif AcceptanceRate < 0.3 :
