@@ -22,7 +22,7 @@ class MonteCarlo:
             myfile.write('time Beta PositiveDERate NegativeDERate AcceptedPositiveDERate average_Positive_DE\n')
     def McMove(self,BinSyst):
         self.Moved.clear()
-        for _ in range(1):#self.Nmove):
+        for _ in range(self.Nmove):
             I0,J0=BinSyst.RmRandContiguousParticle()            
             I1,J1=BinSyst.AddMonoAggregateParticle(I0,J0,self.radius)
             self.Moved.append((I0,J0,I1,J1))
