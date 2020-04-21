@@ -21,8 +21,8 @@ class MonteCarlo:
             myfile.write('time Beta PositiveDERate NegativeDERate AcceptedPositiveDERate averageDE\n')
     def McMove(self,BinSyst):
         self.Moved.clear()
-        for _ in range(1):#self.Nmove):
-            I0,J0=BinSyst.RmRandContiguousParticle()            
+        for _ in range(self.Nmove):
+            I0,J0=BinSyst.RmRandContiguousParticle()
             I1,J1=BinSyst.AddMonoAggregateParticle(I0,J0,self.radius)
             self.Moved.append((I0,J0,I1,J1))
     def Reverse(self,BinSyst):
@@ -43,7 +43,7 @@ class MonteCarlo:
         else:
             self.Refuse+=1
         if Success and DE>=0:
-            self.DEPA+=1        
+            self.DEPA+=1
     def MakeStat(self,time,Beta):
         Ntot=self.Success+self.Refuse
         #DEPArate=self.DEPA/Ntot
@@ -88,5 +88,3 @@ class MonteCarlo:
             self.Nmove=self.Nmove//2
         elif self.radius>max(self.Np//20,3):
             self.radius-=self.Np//20
-        
-            
