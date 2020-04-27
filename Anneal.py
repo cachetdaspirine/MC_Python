@@ -1,4 +1,4 @@
-from System import* 
+from System import*
 from BinarySystem import *
 from McMove import *
 import time
@@ -26,13 +26,13 @@ def Annealing(
     os.system('rm -rf '+Path+'Sim'+str(SimNum))
     os.system('mkdir '+Path+'Sim'+str(SimNum))
 
-    with open(Path+'Sim'+str(SimNum)+'/Energy.out','w') as myfile:
+    with open(Path+'Sim'+str(SimNum)+'_Energy.out','w') as myfile:
         myfile.write('time ElasticEnergy SurfaceEnergy TotalEnergy \n')
 
     StatTime=100
     Shaking=NumberOfParticle**2
-    
-    with open(Path+'Sim'+str(SimNum)+'/Parameter.out','w') as myfile:
+
+    with open(Path+'Sim'+str(SimNum)+'_Parameter.out','w') as myfile:
         myfile.write('TimeStepTot '+str(TimeStepTot)+'\n')
         myfile.write('StatTime '+str(StatTime)+'\n')
         myfile.write('BetaInitial '+str(BetaInitial)+'\n')
@@ -47,6 +47,7 @@ def Annealing(
         myfile.write('SizeY '+str(SizeY)+'\n')
         myfile.write('NumberOfParticles '+str(NumberOfParticle)+'\n')
     rd.seed(Seed)
+    np.random.seed(Seed)
     BinSyst=BinarySystem(SizeX,SizeY)
     MC=MonteCarlo(NumberOfParticle,SimNum,Path=Path)
     for n in range(NumberOfParticle):
@@ -72,7 +73,7 @@ def Annealing(
         #------Energy before the move---------------------
         Eiel=system.Energy
         Eisurf=J*len(BinSyst.BoundarySite)
-        #------Make the move------------------------------    
+        #------Make the move------------------------------
         MC.McMove(BinSyst)
         #------------------------------------
         CopySystem=System(old_system=system)
@@ -104,15 +105,15 @@ def Annealing(
         BinSyst.TranslateInTheMiddle(Xg,Yg)
         if t>StatTime:
             if MC.avDE==0:
-                    system.PrintPerSite(Path+'Sim'+str(SimNum)+'/Site_Final.res')
-                    system.PrintPerSpring(Path+'Sim'+str(SimNum)+'/Spring_Final.res')
+                    system.PrintPerSite(Path+'Sim'+str(SimNum)+'_Site_Final.res')
+                    system.PrintPerSpring(Path+'Sim'+str(SimNum)+'_Spring_Final.res')
                     return (system.Energy+J*len(BinSyst.BoundarySite))/system.Np, MC.AcceptanceRate
             Beta=CoolDown(t,MC.avDE/8.,TimeStepTot)
         #------Make the stats and adapt the McMove--------
-        if t%StatTime==0:        
+        if t%StatTime==0:
             print("time=",t)
             MC.MakeStat(t,Beta)
-            with open(Path+'Sim'+str(SimNum)+'/Energy.out','a') as myfile:
+            with open(Path+'Sim'+str(SimNum)+'_Energy.out','a') as myfile:
                 myfile.write(str(t)+
                              " "+
                              str(system.Energy/system.Np)+
@@ -121,6 +122,6 @@ def Annealing(
                              " "+
                              str((system.Energy+J*len(BinSyst.BoundarySite))/system.Np)+
                              "\n")
-    system.PrintPerSite(Path+'Sim'+str(SimNum)+'/Site_Final.res')
-    system.PrintPerSpring(Path+'Sim'+str(SimNum)+'/Spring_Final.res')
+    system.PrintPerSite(Path+'Sim'+str(SimNum)+'_Site_Final.res')
+    system.PrintPerSpring(Path+'Sim'+str(SimNum)+'_Spring_Final.res')
     return (system.Energy+J*len(BinSyst.BoundarySite))/system.Np, MC.AcceptanceRate

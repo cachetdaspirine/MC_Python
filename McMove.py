@@ -16,14 +16,14 @@ class MonteCarlo:
         self.Moved=list()
         self.Np=Np
         self.SimNum=SimNum
-        with open(self.Path+'Sim'+str(self.SimNum)+'/Stat.out','w') as myfile:
+        with open(self.Path+'Sim'+str(self.SimNum)+'_Stat.out','w') as myfile:
             myfile.write('time Beta AcceptanceRate RefusalRate Nmove Radius\n')
-        with open(self.Path+'Sim'+str(self.SimNum)+'/AdvanceStat.out','w') as myfile:
+        with open(self.Path+'Sim'+str(self.SimNum)+'_AdvanceStat.out','w') as myfile:
             myfile.write('time Beta PositiveDERate NegativeDERate AcceptedPositiveDERate average_Positive_DE\n')
     def McMove(self,BinSyst):
         self.Moved.clear()
         for _ in range(self.Nmove):
-            I0,J0=BinSyst.RmRandContiguousParticle()            
+            I0,J0=BinSyst.RmRandContiguousParticle()
             I1,J1=BinSyst.AddMonoAggregateParticle(I0,J0,self.radius)
             self.Moved.append((I0,J0,I1,J1))
     def Reverse(self,BinSyst):
@@ -44,7 +44,7 @@ class MonteCarlo:
         else:
             self.Refuse+=1
         if Success and DE>=0:
-            self.DEPA+=1        
+            self.DEPA+=1
     def MakeStat(self,time,Beta):
         Ntot=self.Success+self.Refuse
         #DEPArate=self.DEPA/Ntot
@@ -58,10 +58,10 @@ class MonteCarlo:
         DENrate=self.DEN/Ntot
         RefusalRate=self.Refuse/Ntot
         self.AcceptanceRate=self.Success/Ntot
-        with open(self.Path+'Sim'+str(self.SimNum)+'/Stat.out','a') as myfile:
+        with open(self.Path+'Sim'+str(self.SimNum)+'_Stat.out','a') as myfile:
             myfile.write(str(time)+' '+str(Beta)+' '+str(self.AcceptanceRate)+' '+str(RefusalRate)+' ')
             myfile.write(str(self.Nmove)+' '+str(self.radius)+'\n')
-        with open(self.Path+'Sim'+str(self.SimNum)+'/AdvanceStat.out','a') as myfile:
+        with open(self.Path+'Sim'+str(self.SimNum)+'_AdvanceStat.out','a') as myfile:
             myfile.write(str(time)+' '+str(Beta)+' '+str(DEPrate)+' '+str(DENrate)+' '+str(self.DEPArate))
             myfile.write(' '+str(self.avDE)+'\n')
         if self.AcceptanceRate > 0.6:
@@ -93,5 +93,3 @@ class MonteCarlo:
             self.Nmove=self.Nmove//2
         elif self.radius>max(self.Np//20,3):
             self.radius-=self.Np//20
-        
-            

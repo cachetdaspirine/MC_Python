@@ -35,7 +35,7 @@ class BinarySystem :
             for ij in self.GetNeighbors(self.Lx//2, self.Ly//2) :
                 self.BoundarySite.add(ij) # we wanna store pair of index in the array boundarySite
             self.Np+=1
-        else :            
+        else :
             i,j=self.AddRandomParticle(irm,jrm,Radius)
             self.UpdateAfterAddMono(i,j)
         return i,j
@@ -51,7 +51,7 @@ class BinarySystem :
                 ij=rd.sample(self.BoundarySite,1)[0]
         else:
             ij=rd.sample(self.BoundarySite,1)[0]
-            
+
         self.array[ij[0],ij[1]]=1
         self.Np+=1
         return ij[0],ij[1]
@@ -132,26 +132,30 @@ class BinarySystem :
                     input()
     def GetOccupiedNeighbors(self,i,j):
         Res=set()
-        if self.array[i-1,j]==1:
-            Res.add((i-1,j))
-        if self.array[i+1,j]==1:
-            Res.add((i+1,j))        
-        if (i+j)%2==0 and self.array[i,j+1]==1:
-            Res.add((i,j+1))
-        if (i+j)%2==1 and self.array[i,j-1]==1:
-            Res.add((i,j-1))
+        if i-1>=0:
+            if self.array[i-1,j]==1:
+                Res.add((i-1,j))
+        if i+1<self.Lx:
+            if self.array[i+1,j]==1:
+                Res.add((i+1,j))
+        if j+1<self.Ly:
+            if (i+j)%2==0 and self.array[i,j+1]==1:
+                Res.add((i,j+1))
+        if j-1>=0:
+            if (i+j)%2==1 and self.array[i,j-1]==1:
+                Res.add((i,j-1))
         return Res
     def GetFreeNeighbors(self,i,j):
         Res=set()
         if self.array[i-1,j]==0:
             Res.add((i-1,j))
         if self.array[i+1,j]==0:
-            Res.add((i+1,j))        
+            Res.add((i+1,j))
         if (i+j)%2==0 and self.array[i,j+1]==0:
             Res.add((i,j+1))
         if (i+j)%2==1 and self.array[i,j-1]==0:
             Res.add((i,j-1))
-        return Res                
+        return Res
     def GetNeighbors(self,i,j):
         if (i+j)%2==0:
             return {(i-1,j),(i+1,j),(i,j+1)}
@@ -172,7 +176,7 @@ class BinarySystem :
             Xg+=ij[0]
             Yg+=ij[1]
         Xg=int(Xg/len(self.OccupiedSite))
-        Yg=int(Yg/len(self.OccupiedSite))        
+        Yg=int(Yg/len(self.OccupiedSite))
         return Xg,Yg
     def TranslateInTheMiddle(self,i,j):
         self.array=np.array([np.zeros(self.Lx,dtype=int) for _ in range(self.Ly)])
