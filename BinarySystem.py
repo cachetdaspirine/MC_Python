@@ -156,11 +156,38 @@ class BinarySystem :
         if (i+j)%2==1 and self.array[i,j-1]==0:
             Res.add((i,j-1))
         return Res
-    def GetNeighbors(self,i,j):
-        if (i+j)%2==0:
-            return {(i-1,j),(i+1,j),(i,j+1)}
+    def GetNeighbors(self, i,j,Occupied=False,Free=False):
+        ij=(i,j)
+        Res=list()
+        if ij[0]+1<self.Lx:
+            Res.append((ij[0]+1,ij[1]))
+        elif Free:
+            Res.append((np.infty,ij[1]))
+        if ij[0]-1>=0:
+            Res.append((ij[0]-1,ij[1]))
+        elif Free:
+            Res.append((np.infty,ij[1]))
+        if(ij[0]+ij[1])%2==0:
+            if ij[1]+1<self.Ly:
+                Res.append((ij[0],ij[1]+1))
+            elif Free:
+                Res.append((ij[0],np.infty))
         else :
-            return {(i-1,j),(i+1,j),(i,j-1)}
+            if ij[1]-1>=0:
+                Res.append((ij[0],ij[1]-1))
+            elif Free :
+                Res.append((ij[0],np.infty))
+        if Occupied:
+            for n in reversed(range(Res.__len__())):
+                if self.State[Res[n]]!=1:
+                    del Res[n]
+        if Free:
+            for n in reversed(range(Res.__len__())):
+                if all(res!=np.infty for res in Res[n]):
+                    if self.State[Res[n]]!=0:
+                        del Res[n]
+        Res=set(Res)
+        return Res
     def CheckExpansion(self):
         for ij in self.OccupiedSite:
             if ij[0]>=self.Lx-3 or ij[0]>=self.Ly-3 or ij[0]<=2 or ij[1]<=2:
