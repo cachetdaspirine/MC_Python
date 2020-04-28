@@ -23,16 +23,16 @@ def Annealing(
         TimeStepTot=2*10**3,
         Seed=98986
         ):
-    os.system('rm -rf '+Path+'Sim'+str(SimNum))
-    os.system('mkdir '+Path+'Sim'+str(SimNum))
+    #os.system('rm -rf '+Path+'Sim'+str(SimNum))
+    #os.system('mkdir '+Path+'Sim'+str(SimNum))
 
-    with open(Path+'Sim'+str(SimNum)+'_Energy.out','w') as myfile:
+    with open(Path+'/Sim'+str(SimNum)+'_Energy.out','w') as myfile:
         myfile.write('time ElasticEnergy SurfaceEnergy TotalEnergy \n')
 
     StatTime=100
     Shaking=NumberOfParticle**2
 
-    with open(Path+'Sim'+str(SimNum)+'_Parameter.out','w') as myfile:
+    with open(Path+'/Sim'+str(SimNum)+'_Parameter.out','w') as myfile:
         myfile.write('TimeStepTot '+str(TimeStepTot)+'\n')
         myfile.write('StatTime '+str(StatTime)+'\n')
         myfile.write('BetaInitial '+str(BetaInitial)+'\n')
@@ -105,15 +105,15 @@ def Annealing(
         BinSyst.TranslateInTheMiddle(Xg,Yg)
         if t>StatTime:
             if MC.avDE==0:
-                    system.PrintPerSite(Path+'Sim'+str(SimNum)+'_Site_Final.res')
-                    system.PrintPerSpring(Path+'Sim'+str(SimNum)+'_Spring_Final.res')
+                    system.PrintPerSite(Path+'/Sim'+str(SimNum)+'_Site_Final.res')
+                    system.PrintPerSpring(Path+'/Sim'+str(SimNum)+'_Spring_Final.res')
                     return (system.Energy+J*len(BinSyst.BoundarySite))/system.Np, MC.AcceptanceRate
             Beta=CoolDown(t,MC.avDE/8.,TimeStepTot)
         #------Make the stats and adapt the McMove--------
         if t%StatTime==0:
             print("time=",t)
             MC.MakeStat(t,Beta)
-            with open(Path+'Sim'+str(SimNum)+'_Energy.out','a') as myfile:
+            with open(Path+'/Sim'+str(SimNum)+'_Energy.out','a') as myfile:
                 myfile.write(str(t)+
                              " "+
                              str(system.Energy/system.Np)+
@@ -122,6 +122,6 @@ def Annealing(
                              " "+
                              str((system.Energy+J*len(BinSyst.BoundarySite))/system.Np)+
                              "\n")
-    system.PrintPerSite(Path+'Sim'+str(SimNum)+'_Site_Final.res')
-    system.PrintPerSpring(Path+'Sim'+str(SimNum)+'_Spring_Final.res')
+    system.PrintPerSite(Path+'/Sim'+str(SimNum)+'_Site_Final.res')
+    system.PrintPerSpring(Path+'/Sim'+str(SimNum)+'_Spring_Final.res')
     return (system.Energy+J*len(BinSyst.BoundarySite))/system.Np, MC.AcceptanceRate

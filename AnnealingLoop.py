@@ -20,11 +20,14 @@ Npmax=10
 Npmin=3
 NRepetition=10
 TimeStepTot=2*10**3
-seed=None
+seed=1941#None
+for N in range(Npmin,Npmax+1):
+    os.system('mkdir Res/Serie'+str(SerieNum)+'/N_'+str(N))
 
 with open('Res/Serie'+str(SerieNum)+'/Energy.out', 'w') as myfile:
     myfile.write('Number_of_particle Energy Final_Acceptance_rate\n')
 for S in range(NRepetition):
+    seed=rd.randint(198,1500)
     for N in range(Npmin,Npmax+1):
         Energy,Statfinal=Annealing(Kmain=Kmain,
                                 Kcoupling=Kcoupling,
