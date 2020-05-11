@@ -1,5 +1,6 @@
 import numpy as np
 import random as rd
+import copy
 
 def distance(i,j,i_,j_):
     return ((i-i_)**2+(j-j_)**2)**0.5
@@ -35,7 +36,7 @@ class BinarySystem :
             for ij in self.GetNeighbors(self.Lx//2, self.Ly//2) :
                 self.BoundarySite.add(ij) # we wanna store pair of index in the array boundarySite
             self.Np+=1
-        else :            
+        else :
             i,j=self.AddRandomParticle(irm,jrm,Radius)
             self.UpdateAfterAddMono(i,j)
         return i,j
@@ -51,7 +52,7 @@ class BinarySystem :
                 ij=rd.sample(self.BoundarySite,1)[0]
         else:
             ij=rd.sample(self.BoundarySite,1)[0]
-            
+
         self.array[ij[0],ij[1]]=1
         self.Np+=1
         return ij[0],ij[1]
@@ -72,7 +73,7 @@ class BinarySystem :
             return i,j
     def RmRandContiguousParticle(self):
         Fail=True
-        while Fail: # we continue as long as we didn't manage to remove a particle
+        while Fail: #0 0 0 0 0  we continue as long as we didn't manage to remove a particle
             i,j=self.RmRandParticle() # remove
             self.UpdateAfterRmMono(i,j) # update
             Fail=self.CheckDiscontiguity(i,j) # check
@@ -115,6 +116,7 @@ class BinarySystem :
             if self.array[ij[0],ij[1]]==0:
                 self.BoundarySite.add(ij)
     def UpdateAfterRmMono(self,i,j):
+        co=copy.copy(self.BoundarySite)
         try:
             self.OccupiedSite.remove((i,j))
             self.BoundarySite.add((i,j))
@@ -128,35 +130,78 @@ class BinarySystem :
                 except :
                     print((Neigh[0],Neigh[1]))
                     print(self.BoundarySite)
+                    print(co)
+                    print('ij=('+str(i)+','+str(j)+')')
                     self.PrintBinary()
+                    print(self.Lx)
+                    print(self.Ly)
                     input()
     def GetOccupiedNeighbors(self,i,j):
         Res=set()
-        if self.array[i-1,j]==1:
-            Res.add((i-1,j))
-        if self.array[i+1,j]==1:
-            Res.add((i+1,j))        
-        if (i+j)%2==0 and self.array[i,j+1]==1:
-            Res.add((i,j+1))
-        if (i+j)%2==1 and self.array[i,j-1]==1:
-            Res.add((i,j-1))
+        if i-1>=0:
+            if self.array[i-1,j]==1:
+                Res.add((i-1,j))
+        if i+1<self.Lx:
+            if self.array[i+1,j]==1:
+                Res.add((i+1,j))
+        if (i+j)%2==0 :
+            if j+1<self.Ly:
+                if self.array[i,j+1]==1:
+                    Res.add((i,j+1))
+        else :
+            if j-1>=0:
+                if self.array[i,j-1]==1:
+                    Res.add((i,j-1))
         return Res
     def GetFreeNeighbors(self,i,j):
         Res=set()
-        if self.array[i-1,j]==0:
-            Res.add((i-1,j))
-        if self.array[i+1,j]==0:
-            Res.add((i+1,j))        
-        if (i+j)%2==0 and self.array[i,j+1]==0:
-            Res.add((i,j+1))
-        if (i+j)%2==1 and self.array[i,j-1]==0:
-            Res.add((i,j-1))
-        return Res                
-    def GetNeighbors(self,i,j):
-        if (i+j)%2==0:
-            return {(i-1,j),(i+1,j),(i,j+1)}
+        if i-1>=0:
+            if self.array[i-1,j]==0:
+                Res.add((i-1,j))
+        if i+1<self.Lx:
+            if self.array[i+1,j]==0:
+                Res.add((i+1,j))
+        if (i+j)%2==0 :
+            if j+1<self.Ly:
+                if self.array[i,j+1]==0:
+                    Res.add((i,j+1))
         else :
-            return {(i-1,j),(i+1,j),(i,j-1)}
+            if j-1>=0:
+                if self.array[i,j-1]==0:
+                    Res.add((i,j-1))
+        return Res
+    def GetNeighbors(self, i,j,Occupied=False,Free=False):
+        ij=(i,j)
+        Res=list()
+        if ij[0]+1<self.Lx:
+            Res.append((ij[0]+1,ij[1]))
+        elif Free:
+            Res.append((np.infty,ij[1]))
+        if ij[0]-1>=0:
+            Res.append((ij[0]-1,ij[1]))
+        elif Free:
+            Res.append((np.infty,ij[1]))
+        if(ij[0]+ij[1])%2==0:
+            if ij[1]+1<self.Ly:
+                Res.append((ij[0],ij[1]+1))
+            elif Free:
+                Res.append((ij[0],np.infty))
+        else :
+            if ij[1]-1>=0:
+                Res.append((ij[0],ij[1]-1))
+            elif Free :
+                Res.append((ij[0],np.infty))
+        if Occupied:
+            for n in reversed(range(Res.__len__())):
+                if self.State[Res[n]]!=1:
+                    del Res[n]
+        if Free:
+            for n in reversed(range(Res.__len__())):
+                if all(res!=np.infty for res in Res[n]):
+                    if self.State[Res[n]]!=0:
+                        del Res[n]
+        Res=set(Res)
+        return Res
     def CheckExpansion(self):
         for ij in self.OccupiedSite:
             if ij[0]>=self.Lx-3 or ij[0]>=self.Ly-3 or ij[0]<=2 or ij[1]<=2:
@@ -172,7 +217,7 @@ class BinarySystem :
             Xg+=ij[0]
             Yg+=ij[1]
         Xg=int(Xg/len(self.OccupiedSite))
-        Yg=int(Yg/len(self.OccupiedSite))        
+        Yg=int(Yg/len(self.OccupiedSite))
         return Xg,Yg
     def TranslateInTheMiddle(self,i,j):
         self.array=np.array([np.zeros(self.Lx,dtype=int) for _ in range(self.Ly)])
@@ -181,12 +226,27 @@ class BinarySystem :
         else:
             MiddleX,MiddleY=self.Lx//2, self.Ly//2+1
         NewOccupied=set()
-        NewBoundary=set()
+        #NewBoundary=set()
+        co=copy.copy(self.OccupiedSite)
         for ij in self.OccupiedSite:
             NewOccupied.add((ij[0]-i+MiddleX, ij[1]-j+MiddleY))
         self.OccupiedSite=NewOccupied
-        for ij in self.BoundarySite:
-            NewBoundary.add((ij[0]-i+MiddleX, ij[1]-j+MiddleY))
-        self.BoundarySite=NewBoundary
+        #for ij in self.BoundarySite:
+        #    NewBoundary.add((ij[0]-i+MiddleX, ij[1]-j+MiddleY))
+        #self.BoundarySite=NewBoundary
         for ij in self.OccupiedSite:
-            self.array[ij[0],ij[1]]=1
+            try:
+                self.array[ij[0],ij[1]]=1
+            except:
+                print(self.OccupiedSite)
+                self.PrintBinary()
+                print(MiddleX)
+                print(MiddleY)
+                print(i)
+                print(j)
+                print(self.OccupiedSite)
+                input()
+        self.BoundarySite.clear()
+        for ij in self.OccupiedSite:
+            for FreeNeigh in self.GetFreeNeighbors(ij[0],ij[1]):
+                self.BoundarySite.add(FreeNeigh)
