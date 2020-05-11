@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 #!/home/hugo/anaconda3/bin/python3
 
 from Anneal import *
@@ -6,7 +7,7 @@ import os
 
 time_start = time.perf_counter()
 
-SerieNum=9
+SerieNum=1
 
 os.system('rm -rf Res/Serie'+str(SerieNum))
 os.system('mkdir Res/Serie'+str(SerieNum))
@@ -15,19 +16,19 @@ Kmain=1.
 Kcoupling=1.
 Eps=0.1
 KVOL=10.
-J=1.
-Npmax=10
-Npmin=3
-NRepetition=10
-TimeStepTot=2*10**3
-seed=1941#None
+J=0.13
+Npmax=120
+Npmin=120
+NRepetition=1
+TimeStepTot=2*10**4
+seed=None
 for N in range(Npmin,Npmax+1):
     os.system('mkdir Res/Serie'+str(SerieNum)+'/N_'+str(N))
 
 with open('Res/Serie'+str(SerieNum)+'/Energy.out', 'w') as myfile:
     myfile.write('Number_of_particle Energy Final_Acceptance_rate\n')
 for S in range(NRepetition):
-    seed=rd.randint(198,1500)
+    #seed=rd.randint(198,1500)
     for N in range(Npmin,Npmax+1):
         Energy,Statfinal=Annealing(Kmain=Kmain,
                                 Kcoupling=Kcoupling,
