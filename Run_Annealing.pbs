@@ -1,14 +1,13 @@
 #!/bin/bash
 #PBS -V
-#PBS -q q-1jour
+#PBS -q q-1sem
 #PBS -M hugo.le-roy@u-psud.fr
 #PBS -m bae
 
 #On se place dans le repertoire de travail
-cd /home/hleroy/MC_Python
+cd /home/hleroy/Simulation/Mono_Aggregate
 #cd $PBS_O_WORKDIR
 
 #on lance le calcul
-git checkout MonoAggregateMultiSerie
 ./AnnealingLoop.py
 

@@ -17,10 +17,10 @@ Kcoupling=1.
 Eps=0.1
 KVOL=10.
 J=0.13
-Npmax=120
-Npmin=120
-NRepetition=1
-TimeStepTot=2*10**4
+Npmax=140
+Npmin=140
+NRepetition=5
+TimeStepTot=int(2.5*10**4)
 seed=None
 for N in range(Npmin,Npmax+1):
     os.system('mkdir Res/Serie'+str(SerieNum)+'/N_'+str(N))
