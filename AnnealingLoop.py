@@ -1,27 +1,23 @@
-#!/usr/bin/python3
 #!/home/hugo/anaconda3/bin/python3
+#!/usr/bin/python3
 
 from Anneal import *
 import random as rd
 import os
+import sys
+
+if len(sys.argv)<2:
+    print('Number of the serie not specified, please enter a serie name')
+    sys.exit()
+
+SerieNum=sys.argv[1]
+sys.path.insert(0,'Res/Serie'+str(SerieNum))
+from Parameter import *
 
 time_start = time.perf_counter()
 
-SerieNum=1
 
-os.system('rm -rf Res/Serie'+str(SerieNum))
-os.system('mkdir Res/Serie'+str(SerieNum))
 
-Kmain=1.
-Kcoupling=1.
-Eps=0.1
-KVOL=10.
-J=0.13
-Npmax=140
-Npmin=140
-NRepetition=5
-TimeStepTot=int(2.5*10**4)
-seed=None
 for N in range(Npmin,Npmax+1):
     os.system('mkdir Res/Serie'+str(SerieNum)+'/N_'+str(N))
 
