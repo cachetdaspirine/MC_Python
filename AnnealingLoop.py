@@ -4,9 +4,19 @@
 from Anneal import *
 import random as rd
 import os
+import sys
+
+if len(sys.argv)<2:
+    print('Number of the serie not specified, please enter a serie name')
+    sys.exit()
+
+SerieNum=sys.argv[1]
+sys.path.insert(0,'Res/Serie'+str(SerieNum))
+from Parameter import *
 
 time_start = time.perf_counter()
 
+<<<<<<< HEAD
 SerieNum=2
 
 os.system('rm -rf Res/Serie'+str(SerieNum))
@@ -22,6 +32,10 @@ Npmin=200
 NRepetition=1
 TimeStepTot=int(4.*10**4)
 seed=None
+=======
+
+
+>>>>>>> 5a01ed1b0adb66a4c2eb03678d73d93f194cc0dc
 for N in range(Npmin,Npmax+1):
     os.system('mkdir Res/Serie'+str(SerieNum)+'/N_'+str(N))
 

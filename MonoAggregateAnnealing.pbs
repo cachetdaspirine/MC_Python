@@ -9,5 +9,4 @@ cd /home/hleroy/Simulation/Mono_Aggregate
 #cd $PBS_O_WORKDIR
 
 #on lance le calcul
-./AnnealingLoop.py
-
+./AnnealingLoop.py $1

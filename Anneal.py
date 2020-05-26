@@ -29,7 +29,7 @@ def Annealing(
     with open(Path+'/Sim'+str(SimNum)+'_Energy.out','w') as myfile:
         myfile.write('time ElasticEnergy SurfaceEnergy TotalEnergy \n')
 
-    StatTime=100
+    StatTime=TimeStepTot//100
     Shaking=NumberOfParticle**2
 
     with open(Path+'/Sim'+str(SimNum)+'_Parameter.out','w') as myfile:
