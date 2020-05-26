@@ -1,4 +1,3 @@
-#!/home/hugo/anaconda3/bin/python3
 import numpy as np
 from ctypes import cdll
 from ctypes import c_double
@@ -7,12 +6,12 @@ from ctypes import POINTER
 from ctypes import c_void_p
 from ctypes import c_char_p
 
-#__________                        _____                 _____       _________       _____         _____                          ______                                      _____                   
-#___  ____/____________  ____________  /_______________ ___  /______ ______  /       __  /____________(_)______ ________ _______ ____  /_____        _____________  ____________  /______ _______ ___ 
+#__________                        _____                 _____       _________       _____         _____                          ______                                      _____
+#___  ____/____________  ____________  /_______________ ___  /______ ______  /       __  /____________(_)______ ________ _______ ____  /_____        _____________  ____________  /______ _______ ___
 #__  /_    __  ___/_  / / /__  ___/_  __/__  ___/_  __ `/_  __/_  _ \_  __  /        _  __/__  ___/__  / _  __ `/__  __ \__  __ `/__  / _  _ \       __  ___/__  / / /__  ___/_  __/_  _ \__  __ `__ \
 #_  __/    _  /    / /_/ / _(__  ) / /_  _  /    / /_/ / / /_  /  __// /_/ /         / /_  _  /    _  /  / /_/ / _  / / /_  /_/ / _  /  /  __/       _(__  ) _  /_/ / _(__  ) / /_  /  __/_  / / / / /
-#/_/       /_/     \__,_/  /____/  \__/  /_/     \__,_/  \__/  \___/ \__,_/          \__/  /_/     /_/   \__,_/  /_/ /_/ _\__, /  /_/   \___/        /____/  _\__, /  /____/  \__/  \___/ /_/ /_/ /_/ 
-#                                                                                                                        /____/                              /____/                                   
+#/_/       /_/     \__,_/  /____/  \__/  /_/     \__,_/  \__/  \___/ \__,_/          \__/  /_/     /_/   \__,_/  /_/ /_/ _\__, /  /_/   \___/        /____/  _\__, /  /____/  \__/  \___/ /_/ /_/ /_/
+#                                                                                                                        /____/                              /____/
 #
 #      ____________                      0
 #     /\          /\                    /\
@@ -21,7 +20,7 @@ from ctypes import c_char_p
 #  /j+1,4 \    / i+1  \              / i,j  \    (i+j)%2==1
 # /        \  /,j+1,2  \            /        \
 #/__________\/__________\         2/__________\4
-#\          /\   i+1    / 
+#\          /\   i+1    /
 # \ i-1    /  \  ,j,1  /          1____________5
 #  \,j,5  /    \      /            \          /
 #   \    /      \    /              \  i,j   /
@@ -131,7 +130,7 @@ class System:
             Arraycpp[i]=array[i] # store all the array into this pointer array
         #-------------------------------------------------------------------
         # store the value of the elastic parameters
-        #-------------------------------------------------------------------        
+        #-------------------------------------------------------------------
         self.Kmain=Kmain
         self.Kcoupling=Kcoupling
         self.KVOL=Kvol
@@ -160,7 +159,7 @@ class System:
         for j in reversed(range(self.state.shape[1])):
             for i in range(self.state.shape[0]):
                 print(str(self.state[i,j])+" ",end='')
-            print('\n',end='')       
+            print('\n',end='')
     def SetElasticConstant(self,Kmain=np.nan,Kcoupling=np.nan,epsilon=np.nan,KVOL=np.nan):
         # This is a single  function to  change any of the elastic constant.
         # the elastic constant for which we give a value is gonna be changed
@@ -182,7 +181,7 @@ class System:
         else :
             epsilon1=epsilon
         lib.SetElasticConstant(epsilon1,Kmain1,Kcoupling1,KVOL1,self.Adress)
-    def Evolv(self,NewState):            
+    def Evolv(self,NewState):
         self.ActualizeNp()
         #------------Convert the new state into a pointer array-------------
         self.state=NewState
@@ -206,7 +205,7 @@ class System:
             self.Energy=lib.GetSystemEnergy(self.Adress)
             print('create a new system')
         else :
-            lib.UpdateSystemEnergy(self.Adress,Arraycpp,self.Lx,self.Ly) 
+            lib.UpdateSystemEnergy(self.Adress,Arraycpp,self.Lx,self.Ly)
             self.Energy=lib.GetSystemEnergy(self.Adress)
     def PrintPerSite(self,Name='NoName.txt'):
         # output the sytem per site (easier if you wanna plot the sites).
@@ -279,7 +278,7 @@ class System:
         XC=sum(X1)/X1.shape[0]
         YC=sum(Y1)/Y1.shape[0]
         ax.set_xlim([XC-1/Zoom*np.sqrt(Data.shape[0]/12.),XC+1/Zoom*np.sqrt(Data.shape[0]/12.)])
-        ax.set_ylim([YC-1/Zoom*np.sqrt(Data.shape[0]/12.),YC+1/Zoom*np.sqrt(Data.shape[0]/12.)])        
+        ax.set_ylim([YC-1/Zoom*np.sqrt(Data.shape[0]/12.),YC+1/Zoom*np.sqrt(Data.shape[0]/12.)])
         plot=ax.quiver(X1,Y1,X2-X1,Y2-Y1,C1-C0,
              scale = 1.0,angles='xy',scale_units = 'xy',width = 0.002,minlength=0.,headlength=0.,
              headaxislength=0.,headwidth=0.,alpha=1,edgecolor='k',cmap=cm)
@@ -295,4 +294,3 @@ class System:
             self.Np=dict(zip(unique, counts))[1]
         except:
             self.Np=0
-        
