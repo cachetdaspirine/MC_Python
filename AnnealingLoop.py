@@ -16,26 +16,7 @@ from Parameter import *
 
 time_start = time.perf_counter()
 
-<<<<<<< HEAD
-SerieNum=2
 
-os.system('rm -rf Res/Serie'+str(SerieNum))
-os.system('mkdir Res/Serie'+str(SerieNum))
-
-Kmain=1.
-Kcoupling=1.
-Eps=0.01
-KVOL=15.
-J=0.001
-Npmax=200
-Npmin=200
-NRepetition=1
-TimeStepTot=int(4.*10**4)
-seed=None
-=======
-
-
->>>>>>> 5a01ed1b0adb66a4c2eb03678d73d93f194cc0dc
 for N in range(Npmin,Npmax+1):
     os.system('mkdir Res/Serie'+str(SerieNum)+'/N_'+str(N))
 
