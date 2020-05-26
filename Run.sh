@@ -8,4 +8,4 @@ mkdir "Res/Serie$SerieNum"
 
 cp Parameter.py "Res/Serie$SerieNum/Parameter.py"
 
-sbatch MonoAggregateAnnealing.pbs $SerieNum $QueueType
+sbatch MonoAggregateAnnealing.pbs $SerieNum
