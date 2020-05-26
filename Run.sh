@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SerieNum=0
+SerieNum=1
 QueueType=qbigmem
 
 rm -rf "Res/Serie$SerieNum"
