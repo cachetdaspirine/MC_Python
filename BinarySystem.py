@@ -116,7 +116,7 @@ class BinarySystem :
             if self.array[ij[0],ij[1]]==0:
                 self.BoundarySite.add(ij)
     def UpdateAfterRmMono(self,i,j):
-        co=copy.copy(self.BoundarySite)
+        #co=copy.copy(self.BoundarySite)
         try:
             self.OccupiedSite.remove((i,j))
             self.BoundarySite.add((i,j))
@@ -227,7 +227,7 @@ class BinarySystem :
             MiddleX,MiddleY=self.Lx//2, self.Ly//2+1
         NewOccupied=set()
         #NewBoundary=set()
-        co=copy.copy(self.OccupiedSite)
+        #co=copy.copy(self.OccupiedSite)
         for ij in self.OccupiedSite:
             NewOccupied.add((ij[0]-i+MiddleX, ij[1]-j+MiddleY))
         self.OccupiedSite=NewOccupied
