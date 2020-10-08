@@ -72,7 +72,7 @@ def Annealing(
         Success=True
         #------Energy before the move---------------------
         Eiel=system.Energy
-        Eisurf=J*len(BinSyst.BoundarySite)
+        Eisurf=J*BinSyst.GetSurface()#len(BinSyst.BoundarySite)
         #------Make the move------------------------------
         MC.McMove(BinSyst)
         #------------------------------------
@@ -80,7 +80,7 @@ def Annealing(
         CopySystem.Evolv(BinSyst.array)
         #------Store the Energy after the move------------
         Eaftel=CopySystem.Energy
-        Eaftsurf=J*len(BinSyst.BoundarySite)
+        Eaftsurf=J*BinSyst.GetSurface()
 
         if((Eaftel+Eaftsurf)-(Eiel+Eisurf)>20*J):
             print(system.Energy)
@@ -107,7 +107,7 @@ def Annealing(
             if MC.avDE==0:
                     system.PrintPerSite(Path+'/Sim'+str(SimNum)+'_Site_Final.res')
                     system.PrintPerSpring(Path+'/Sim'+str(SimNum)+'_Spring_Final.res')
-                    return (system.Energy+J*len(BinSyst.BoundarySite))/system.Np, MC.AcceptanceRate
+                    return (system.Energy+J*BinSyst.GetSurface())/system.Np, MC.AcceptanceRate
             Beta=CoolDown(t,MC.avDE/8.,TimeStepTot)
         #------Make the stats and adapt the McMove--------
         if t%StatTime==0:
@@ -118,10 +118,10 @@ def Annealing(
                              " "+
                              str(system.Energy/system.Np)+
                              " "+
-                             str(J*len(BinSyst.BoundarySite)/system.Np)+
+                             str(J*BinSyst.GetSurface()/system.Np)+
                              " "+
-                             str((system.Energy+J*len(BinSyst.BoundarySite))/system.Np)+
+                             str((system.Energy+J*BinSyst.GetSurface())/system.Np)+
                              "\n")
     system.PrintPerSite(Path+'/Sim'+str(SimNum)+'_Site_Final.res')
     system.PrintPerSpring(Path+'/Sim'+str(SimNum)+'_Spring_Final.res')
-    return (system.Energy+J*len(BinSyst.BoundarySite))/system.Np, MC.AcceptanceRate
+    return (system.Energy+J*BinSyst.GetSurface())/system.Np, MC.AcceptanceRate

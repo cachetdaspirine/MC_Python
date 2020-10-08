@@ -22,6 +22,11 @@ class BinarySystem :
             for i in range(self.array.shape[0]):
                 print(str(self.array[i,j])+" ",end='')
             print('\n',end='')
+    def GetSurface(self):
+        surf = 0
+        for site in self.OccupiedSite():
+            surf+=self.GetFreeNeighbors(site[0],site[1])
+        return surf
     def ReverseMove(self,Irm,Jrm,Iadd,Jadd):
         self.RmParticle(Iadd,Jadd)
         self.UpdateAfterRmMono(Iadd,Jadd)
