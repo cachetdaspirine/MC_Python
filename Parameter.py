@@ -1,3 +1,4 @@
+ParticleType = 'Triangle'
 Kmain=1.
 Kcoupling=0.1
 Eps=0.01

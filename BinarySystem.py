@@ -1,12 +1,21 @@
 import numpy as np
 import random as rd
 import copy
-
+TopologieDownHex = [(1,0),(0,1),(-1,1),(-1,0),(0,-1),(1,-1)]
+TopologieUpHex = [(1,0),(0,1),(-1,1),(-1,0),(0,-1),(1,-1)]
+TopologieDownTriangle = [(1,0),(-1,0),(0,1)]
+TopologieUpTriangle = [(1,0),(-1,0),(0,-1)]
 def distance(i,j,i_,j_):
     return ((i-i_)**2+(j-j_)**2)**0.5
 
 class BinarySystem :
-    def __init__(self, sizeX,sizeY):
+    def __init__(self, sizeX,sizeY,ParticleType='Triangle'):
+        if ParticleType == 'Triangle':
+            self.TopologieUp = TopologieUpTriangle
+            self.TopologieDown = TopologieDownTriangle
+        elif ParticleType=='Hexagon':
+            self.TopologieUp = TopologieUpHex
+            self.TopologieDown = TopologieDownHex
         self.Lx=int(sizeX)
         self.Ly=int(sizeY)
         self.array=np.array([np.zeros(self.Lx,dtype=int) for _ in range(self.Ly)])
@@ -24,8 +33,9 @@ class BinarySystem :
             print('\n',end='')
     def GetSurface(self):
         surf = 0
-        for site in self.OccupiedSite():
-            surf+=self.GetFreeNeighbors(site[0],site[1])
+        #print(self.OccupiedSite.__len__())
+        for site in self.OccupiedSite:
+            surf+=self.GetBorderNeighbors(site[0],site[1])
         return surf
     def ReverseMove(self,Irm,Jrm,Iadd,Jadd):
         self.RmParticle(Iadd,Jadd)
@@ -38,7 +48,7 @@ class BinarySystem :
             self.array[self.Lx//2][self.Ly//2]=1 #if there is no particle, add a newone ine the middle
             self.OccupiedSite.add((self.Lx//2,self.Ly//2))
             i,j=self.Lx//2, self.Ly//2
-            for ij in self.GetNeighbors(self.Lx//2, self.Ly//2) :
+            for ij in self.GetFreeNeighbors(self.Lx//2, self.Ly//2) :
                 self.BoundarySite.add(ij) # we wanna store pair of index in the array boundarySite
             self.Np+=1
         else :
@@ -117,9 +127,8 @@ class BinarySystem :
     def UpdateAfterAddMono(self,i,j):
         self.OccupiedSite.add((i,j))
         self.BoundarySite.remove((i,j))
-        for ij in self.GetNeighbors(i,j):
-            if self.array[ij[0],ij[1]]==0:
-                self.BoundarySite.add(ij)
+        for ij in self.GetFreeNeighbors(i,j):
+            self.BoundarySite.add(ij)
     def UpdateAfterRmMono(self,i,j):
         #co=copy.copy(self.BoundarySite)
         try:
@@ -142,71 +151,59 @@ class BinarySystem :
                     print(self.Ly)
                     input()
     def GetOccupiedNeighbors(self,i,j):
-        Res=set()
-        if i-1>=0:
-            if self.array[i-1,j]==1:
-                Res.add((i-1,j))
-        if i+1<self.Lx:
-            if self.array[i+1,j]==1:
-                Res.add((i+1,j))
-        if (i+j)%2==0 :
-            if j+1<self.Ly:
-                if self.array[i,j+1]==1:
-                    Res.add((i,j+1))
-        else :
-            if j-1>=0:
-                if self.array[i,j-1]==1:
-                    Res.add((i,j-1))
-        return Res
-    def GetFreeNeighbors(self,i,j):
-        Res=set()
-        if i-1>=0:
-            if self.array[i-1,j]==0:
-                Res.add((i-1,j))
-        if i+1<self.Lx:
-            if self.array[i+1,j]==0:
-                Res.add((i+1,j))
-        if (i+j)%2==0 :
-            if j+1<self.Ly:
-                if self.array[i,j+1]==0:
-                    Res.add((i,j+1))
-        else :
-            if j-1>=0:
-                if self.array[i,j-1]==0:
-                    Res.add((i,j-1))
-        return Res
-    def GetNeighbors(self, i,j,Occupied=False,Free=False):
+        # get the real or window index
+        # Choose the topologie to use depending on the up/down
         ij=(i,j)
-        Res=list()
-        if ij[0]+1<self.Lx:
-            Res.append((ij[0]+1,ij[1]))
-        elif Free:
-            Res.append((np.infty,ij[1]))
-        if ij[0]-1>=0:
-            Res.append((ij[0]-1,ij[1]))
-        elif Free:
-            Res.append((np.infty,ij[1]))
-        if(ij[0]+ij[1])%2==0:
-            if ij[1]+1<self.Ly:
-                Res.append((ij[0],ij[1]+1))
-            elif Free:
-                Res.append((ij[0],np.infty))
+        if (ij[0]+ij[1])%2==0:
+            Res = np.array(self.TopologieDown)+np.array(ij)
         else :
-            if ij[1]-1>=0:
-                Res.append((ij[0],ij[1]-1))
-            elif Free :
-                Res.append((ij[0],np.infty))
-        if Occupied:
-            for n in reversed(range(Res.__len__())):
-                if self.State[Res[n]]!=1:
-                    del Res[n]
-        if Free:
-            for n in reversed(range(Res.__len__())):
-                if all(res!=np.infty for res in Res[n]):
-                    if self.State[Res[n]]!=0:
-                        del Res[n]
-        Res=set(Res)
-        return Res
+            Res = np.array(self.TopologieUp)+np.array(ij)
+        # regularize the result array with only the value that can be inside the state
+        Resreg=np.delete(Res,np.argwhere((Res[:,0]>=self.Lx) | (Res[:,0]<0) | (Res[:,1]>=self.Ly) | (Res[:,1]<0)),0)
+        #Build a numpy array of tuple
+        Resbis=np.empty(Resreg.__len__(),dtype=object)
+        Resbis[:] = list(zip(Resreg[:,0],Resreg[:,1]))
+        #check the occupancie or not
+        Resbis=Resbis[np.array([self.array[r]==1 for r in Resbis ])]
+        return set(Resbis)
+    def GetFreeNeighbors(self,i,j):
+        # get the real or window index
+        # Choose the topologie to use depending on the up/down
+        ij=(i,j)
+        if (ij[0]+ij[1])%2==0:
+            Res = np.array(self.TopologieDown)+np.array(ij)
+        else :
+            Res = np.array(self.TopologieUp)+np.array(ij)
+        # regularize the result array with only the value that can be inside the state
+        Resreg=np.delete(Res,np.argwhere((Res[:,0]>=self.Lx) | (Res[:,0]<0) | (Res[:,1]>=self.Ly) | (Res[:,1]<0)),0)
+        #Build a numpy array of tuple
+        Resbis=np.empty(Resreg.__len__(),dtype=object)
+        Resbis[:] = list(zip(Resreg[:,0],Resreg[:,1]))
+        #check the occupancie or not
+        Resbis=Resbis[np.array([self.array[r]==0 for r in Resbis ])]
+        return set(Resbis)
+    def GetBorderNeighbors(self, i,j):
+        # get the real or window index
+        # Choose the topologie to use depending on the up/down
+        ij=(i,j)
+        if (ij[0]+ij[1])%2==0:
+            Res = np.array(self.TopologieDown)+np.array(ij)
+        else :
+            Res = np.array(self.TopologieUp)+np.array(ij)
+        # regularize the result array with only the value that can be inside the state
+        #Resreg=np.delete(Res,np.argwhere((Res[:,0]>=self.Size) | (Res[:,0]<0) | (Res[:,1]>=self.Size) | (Res[:,1]<0)),0)
+        #Build a numpy array of tuple
+        Resbis=np.empty(Res.__len__(),dtype=object)
+        Resbis[:] = list(zip(Res[:,0],Res[:,1]))
+        Resbis = list(Resbis)
+        #check the occupancie or not
+        for n in reversed(range(Resbis.__len__())):
+            if Resbis[n][0]>=0 and Resbis[n][1]>=0 and Resbis[n][0]<self.Lx and Resbis[n][1]<self.Ly:
+                if self.array[Resbis[n]]!=0:
+                    del Resbis[n]
+        #check the occupancie or not
+        #Resbis=Resbis[np.array([self.array[r]==0 for r in Resbis ])]
+        return set(Resbis).__len__()
     def CheckExpansion(self):
         for ij in self.OccupiedSite:
             if ij[0]>=self.Lx-3 or ij[0]>=self.Ly-3 or ij[0]<=2 or ij[1]<=2:

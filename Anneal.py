@@ -22,6 +22,7 @@ def Annealing(
         BetaInitial=0,
         TimeStepTot=2*10**3,
         Seed=98986
+        ParticleType='Triangle'
         ):
     #os.system('rm -rf '+Path+'Sim'+str(SimNum))
     #os.system('mkdir '+Path+'Sim'+str(SimNum))
@@ -33,6 +34,7 @@ def Annealing(
     Shaking=NumberOfParticle**2
 
     with open(Path+'/Sim'+str(SimNum)+'_Parameter.out','w') as myfile:
+        myfile.write('ParticleType '+ParticleType)
         myfile.write('TimeStepTot '+str(TimeStepTot)+'\n')
         myfile.write('StatTime '+str(StatTime)+'\n')
         myfile.write('BetaInitial '+str(BetaInitial)+'\n')
@@ -48,7 +50,7 @@ def Annealing(
         myfile.write('NumberOfParticles '+str(NumberOfParticle)+'\n')
     rd.seed(Seed)
     np.random.seed(Seed)
-    BinSyst=BinarySystem(SizeX,SizeY)
+    BinSyst=BinarySystem(SizeX,SizeY,ParticleType=ParticleType)
     MC=MonteCarlo(NumberOfParticle,SimNum,Path=Path)
     for n in range(NumberOfParticle):
         BinSyst.AddMonoAggregateParticle()
@@ -58,7 +60,7 @@ def Annealing(
         BinSyst.AddMonoAggregateParticle()
         Xg,Yg=BinSyst.ComputeCenter()
         BinSyst.TranslateInTheMiddle(Xg,Yg)
-    system=System(BinSyst.array,eps=Eps,Kmain=Kmain,Kcoupling=Kcoupling,Kvol=KVOL)
+    system=System(BinSyst.array,eps=Eps,Kmain=Kmain,Kcoupling=Kcoupling,Kvol=KVOL,ParticleType=ParticleType)
     print(" __  __           _             _                             ")
     print("|  \/  |   __ _  (_)  _ __     | |       ___     ___    _ __  ")
     print("| |\/| |  / _` | | | | '_ \    | |      / _ \   / _ \  | '_ \ ")
