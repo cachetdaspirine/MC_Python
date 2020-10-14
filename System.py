@@ -163,14 +163,11 @@ class System:
         #--------------------Store the value of the Energy------------------
         self.Energy=self.lib.GetSystemEnergy(self.Adress) # store the value of the Energy (get energy only returns a number and doesn't reactualize the equilibrium of the system).
     def Copy(self,old_system):
-        self.ParticleType = old_cluster.ParticleType
+        self.ParticleType = old_system.ParticleType
         if self.ParticleType=='Triangle':
             self.lib=libTriangle
         elif self.ParticleType=='Hexagon':
             self.lib=libHexagon
-        print(self.ParticleType)
-        if self.lib:
-            print('ok')
         self.Lx=old_system.Lx
         self.Ly=old_system.Ly
         self.state=old_system.state
