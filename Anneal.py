@@ -21,7 +21,7 @@ def Annealing(
         Path='',
         BetaInitial=0,
         TimeStepTot=2*10**3,
-        Seed=98986
+        Seed=98986,
         ParticleType='Triangle'
         ):
     #os.system('rm -rf '+Path+'Sim'+str(SimNum))
