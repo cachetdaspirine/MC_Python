@@ -168,6 +168,9 @@ class System:
             self.lib=libTriangle
         elif self.ParticleType=='Hexagon':
             self.lib=libHexagon
+        print(self.ParticleType)
+        if self.lib:
+            print('ok')
         self.Lx=old_system.Lx
         self.Ly=old_system.Ly
         self.state=old_system.state
