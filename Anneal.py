@@ -34,7 +34,7 @@ def Annealing(
     Shaking=NumberOfParticle**2
 
     with open(Path+'/Sim'+str(SimNum)+'_Parameter.out','w') as myfile:
-        myfile.write('ParticleType '+ParticleType)
+        myfile.write('ParticleType '+ParticleType+'\n')
         myfile.write('TimeStepTot '+str(TimeStepTot)+'\n')
         myfile.write('StatTime '+str(StatTime)+'\n')
         myfile.write('BetaInitial '+str(BetaInitial)+'\n')
@@ -84,13 +84,13 @@ def Annealing(
         Eaftel=CopySystem.Energy
         Eaftsurf=J*BinSyst.GetSurface()
 
-        if((Eaftel+Eaftsurf)-(Eiel+Eisurf)>20*J):
-            print(system.Energy)
-            print(CopySystem.Energy)
-            del(system)
-            system=System(BinSyst.array,eps=Eps,Kmain=Kmain,Kcoupling=Kcoupling,Kvol=KVOL)
-            print(system.Energy)
-            print("Remake the system")
+        # if((Eaftel+Eaftsurf)-(Eiel+Eisurf)>20*J):
+            # print(system.Energy)
+            # print(CopySystem.Energy)
+            # del(system)
+            # system=System(BinSyst.array,eps=Eps,Kmain=Kmain,Kcoupling=Kcoupling,Kvol=KVOL,ParticleType=ParticleType)
+            # print(system.Energy)
+
         #------see wether we accept the move or not-------
         if rd.uniform(0,1)>np.exp(-((Eaftel+Eaftsurf)-(Eiel+Eisurf))*Beta) :
             #--Move refused-------------------------------
