@@ -109,6 +109,7 @@ def Annealing(
             if MC.avDE==0:
                     system.PrintPerSite(Path+'/Sim'+str(SimNum)+'_Site_Final.res')
                     system.PrintPerSpring(Path+'/Sim'+str(SimNum)+'_Spring_Final.res')
+                    system.PrintSpringPerSite(Path+'/Sim'+str(SimNum)+'_SpringSite_Final.res')
                     return (system.Energy+J*BinSyst.GetSurface())/system.Np, MC.AcceptanceRate
             Beta=CoolDown(t,MC.avDE/8.,TimeStepTot)
         #------Make the stats and adapt the McMove--------
@@ -126,4 +127,5 @@ def Annealing(
                              "\n")
     system.PrintPerSite(Path+'/Sim'+str(SimNum)+'_Site_Final.res')
     system.PrintPerSpring(Path+'/Sim'+str(SimNum)+'_Spring_Final.res')
+    system.PrintSpringPerSite(Path+'/Sim'+str(SimNum)+'_SpringSite_Final.res')
     return (system.Energy+J*BinSyst.GetSurface())/system.Np, MC.AcceptanceRate
