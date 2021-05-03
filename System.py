@@ -321,6 +321,8 @@ class System:
         self.Expansion = old_system.Expansion
         if self.Expansion :
             self.lib = libRand
+            self.Mc = old_cluster.Mc
+            self.q0 = old_cluster.q0
         elif self.ParticleType == 'Triangle':
             self.lib = libTriangle
         elif self.ParticleType == 'Hexagon':
