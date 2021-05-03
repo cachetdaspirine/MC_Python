@@ -22,7 +22,8 @@ def Annealing(
         BetaInitial=0,
         TimeStepTot=2*10**3,
         Seed=98986,
-        ParticleType='Triangle'
+        ParticleType='Triangle',
+        Expansion = False
         ):
     #os.system('rm -rf '+Path+'Sim'+str(SimNum))
     #os.system('mkdir '+Path+'Sim'+str(SimNum))
@@ -60,7 +61,7 @@ def Annealing(
         BinSyst.AddMonoAggregateParticle()
         Xg,Yg=BinSyst.ComputeCenter()
         BinSyst.TranslateInTheMiddle(Xg,Yg)
-    system=System(BinSyst.array,eps=Eps,Kmain=Kmain,Kcoupling=Kcoupling,Kvol=KVOL,ParticleType=ParticleType)
+    system=System(BinSyst.array,eps=Eps,Kmain=Kmain,Kcoupling=Kcoupling,Kvol=KVOL,ParticleType=ParticleType,Expansion = Expansion)
     print(" __  __           _             _                             ")
     print("|  \/  |   __ _  (_)  _ __     | |       ___     ___    _ __  ")
     print("| |\/| |  / _` | | | | '_ \    | |      / _ \   / _ \  | '_ \ ")
@@ -108,8 +109,8 @@ def Annealing(
         if t>StatTime:
             if MC.avDE==0:
                     system.PrintPerSite(Path+'/Sim'+str(SimNum)+'_Site_Final.res')
-                    system.PrintPerSpring(Path+'/Sim'+str(SimNum)+'_Spring_Final.res')
-                    system.PrintSpringPerSite(Path+'/Sim'+str(SimNum)+'_SpringSite_Final.res')
+                    #system.PrintPerSpring(Path+'/Sim'+str(SimNum)+'_Spring_Final.res')
+                    #system.PrintSpringPerSite(Path+'/Sim'+str(SimNum)+'_SpringSite_Final.res')
                     return (system.Energy+J*BinSyst.GetSurface())/system.Np, MC.AcceptanceRate
             Beta=CoolDown(t,MC.avDE/8.,TimeStepTot)
         #------Make the stats and adapt the McMove--------
@@ -126,6 +127,7 @@ def Annealing(
                              str((system.Energy+J*BinSyst.GetSurface())/system.Np)+
                              "\n")
     system.PrintPerSite(Path+'/Sim'+str(SimNum)+'_Site_Final.res')
-    system.PrintPerSpring(Path+'/Sim'+str(SimNum)+'_Spring_Final.res')
-    system.PrintSpringPerSite(Path+'/Sim'+str(SimNum)+'_SpringSite_Final.res')
+    system.PlotPerSite()
+    #system.PrintPerSpring(Path+'/Sim'+str(SimNum)+'_Spring_Final.res')
+    #system.PrintSpringPerSite(Path+'/Sim'+str(SimNum)+'_SpringSite_Final.res')
     return (system.Energy+J*BinSyst.GetSurface())/system.Np, MC.AcceptanceRate

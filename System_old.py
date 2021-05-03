@@ -2,11 +2,9 @@ import os
 import matplotlib.colors as mcolors
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.collections import PatchCollection
-import matplotlib.lines as mlines
 from matplotlib.patches import Polygon
 import matplotlib.pyplot as plt
 import numpy as np
-import time
 import pathlib
 from ctypes import cdll
 from ctypes import c_double
@@ -14,8 +12,6 @@ from ctypes import c_int
 from ctypes import POINTER
 from ctypes import c_void_p
 from ctypes import c_char_p
-from MC import *
-import copy
 
 # __________                        _____                 _____       _________       _____         _____                          ______                                      _____
 # ___  ____/____________  ____________  /_______________ ___  /______ ______  /       __  /____________(_)______ ________ _______ ____  /_____        _____________  ____________  /______ _______ ___
@@ -97,12 +93,6 @@ libTriangle.OutputSystemSpring.argtypes = [POINTER(c_void_p), c_char_p]
 libTriangle.GetBulkEnergy.argtypes = [POINTER(c_void_p)]
 libTriangle.GetBulkEnergy.restype = c_double
 
-libTriangle.AffineDeformation.argtypes = [POINTER(c_void_p),c_double,c_double]
-libTriangle.AffineDeformation.restype = c_double
-
-libTriangle.Extension.argtypes = [POINTER(c_void_p),c_int]
-libTriangle.Extension.restype = c_double
-
 libHexagon = cdll.LoadLibrary(
     str(pathlib.Path(__file__).parent.absolute()) + '/libHexagon.so')
 
@@ -128,41 +118,7 @@ libHexagon.OutputSpringPerSite.argtypes = [POINTER(c_void_p), c_char_p]
 libHexagon.GetBulkEnergy.argtypes = [POINTER(c_void_p)]
 libHexagon.GetBulkEnergy.restype = c_double
 
-libHexagon.AffineDeformation.argtypes = [POINTER(c_void_p),c_double,c_double]
-libHexagon.AffineDeformation.restype = c_double
 
-libHexagon.Extension.argtypes = [POINTER(c_void_p),c_int]
-libHexagon.Extension.restype = c_double
-
-libRand = cdll.LoadLibrary(
-    str(pathlib.Path(__file__).parent.absolute()) + '/libRand.so')
-
-libRand.CreateSystem.restype = POINTER(c_void_p)
-libRand.CreateSystem.argtypes = [POINTER(c_int), POINTER(c_double), POINTER(c_double), c_int, c_int]
-libRand.DeleteSystem.argtypes = [POINTER(c_void_p)]
-libRand.CopySystem.argtypes = [POINTER(c_void_p)]
-libRand.CopySystem.restype = POINTER(c_void_p)
-
-libRand.UpdateSystemEnergy.argtypes = [
-    POINTER(c_void_p), POINTER(c_int), c_int, c_int]
-libRand.GetSystemEnergy.restype = c_double
-libRand.GetSystemEnergy.argtypes = [POINTER(c_void_p)]
-
-libRand.OutputSystemSite.argtypes = [POINTER(c_void_p), c_char_p]
-
-libRand.GetBulkEnergy.argtypes = [POINTER(c_void_p)]
-libRand.GetBulkEnergy.restype = c_double
-
-
-libRand.AffineDeformation.argtypes = [POINTER(c_void_p),c_double,c_double]
-libRand.AffineDeformation.restype = c_double
-
-libRand.Extension.argtypes = [POINTER(c_void_p),c_int]
-libRand.Extension.restype = c_double
-import math
-def truncate(number, digits) -> float:
-    stepper = 10.0 ** digits
-    return math.trunc(stepper * number) / stepper
 def make_colormap(seq):
     """Return a LinearSegmentedColormap
     seq: a sequence of floats and RGB-tuples. The floats should be increasing
@@ -178,11 +134,6 @@ def make_colormap(seq):
             cdict['green'].append([item, g1, g2])
             cdict['blue'].append([item, b1, b2])
     return mcolors.LinearSegmentedColormap('CustomMap', cdict)
-CNRSColors = [(98./255.,196./255.,221./255.),
-            (0/255.,41./255.,75./255.),
-            (69./255.,100./255.,135./255.),
-            (0./255.,126./255.,148./255.),
-            (0./255.,68./255.,148./255.)]
 
 
 cdict = {'blue':   ((0.0,  0.9, 0.9),
@@ -244,9 +195,7 @@ class System:
                  Kvol=1.,
                  old_system=None,
                  ParticleType='Triangle',
-                 Parameter=None,
-                 Expansion = False):
-        self.Expansion = Expansion
+                 Parameter=None):
         if old_system == None:
             if not Parameter:
                 self.ParticleType = ParticleType
@@ -265,9 +214,7 @@ class System:
         # the pointer toward the cpp object. Each time we call a c++ function
         # we have to give it the adress of the  pointer,  that  the  function
         # will interpret as a pointer toward the c++ object
-        if self.Expansion:
-            self.lib = libRand
-        elif self.ParticleType == 'Triangle':
+        if self.ParticleType == 'Triangle':
             self.lib = libTriangle
         elif self.ParticleType == 'Hexagon':
             self.lib = libHexagon
@@ -294,34 +241,16 @@ class System:
         self.ActualizeNp()  # keep track of the number of particle (number of 1) in the system
         # ---------------------Create the cpp object-------------------------
         # create the system, all the argument are require here !!!!
-        if self.Expansion :
-            self.Mc,self.q0 = get_Mc(k = self.Kmain,
-                           kc = self.Kcoupling,
-                           eps = self.eps,
-                           kA = self.KVOL)
-            MC = copy.copy(self.Mc.flatten())
-            MCcpp = MC.ctypes.data_as(POINTER(c_double))
-            for i in range(MC.shape[0]):
-                MCcpp[i] = MC[i]
-
-            Q0 = copy.copy(self.q0)
-            Q0cpp = Q0.ctypes.data_as(POINTER(c_double))
-            for i in range(Q0.shape[0]):
-                Q0cpp[i] = Q0[i]
-            self.Adress = self.lib.CreateSystem(Arraycpp, MCcpp,Q0cpp,self.Lx,self.Ly)
-        else :
-            self.Adress=self.lib.CreateSystem(Arraycpp,self.Lx,self.Ly,eps,Kmain,Kcoupling,Kvol) # create the system, all the argument are require here !!!!
+        self.Adress = self.lib.CreateSystem(
+            Arraycpp, self.Lx, self.Ly, eps, Kmain, Kcoupling, Kvol)
         # --------------------Store the value of the Energy------------------
         # store the value of the Energy (get energy only returns a number and doesn't reactualize the equilibrium of the system).
         self.Energy = self.lib.GetSystemEnergy(self.Adress)
         self.MAP = cm
 
     def Copy(self, old_system):
-        self.ParticleType = old_system.ParticleType
-        self.Expansion = old_system.Expansion
-        if self.Expansion :
-            self.lib = libRand
-        elif self.ParticleType == 'Triangle':
+        self.ParticleType = old_cluster.ParticleType
+        if self.ParticleType == 'Triangle':
             self.lib = libTriangle
         elif self.ParticleType == 'Hexagon':
             self.lib = libHexagon
@@ -391,27 +320,11 @@ class System:
             self.Lx = NewState.shape[0]
             self.Ly = NewState.shape[1]
             self.lib.DeleteSystem(self.Adress)
-            if Expansion :
-                self.Mc,self.q0 = get_Mc(k = self.Kmain,
-                               kc = self.Kcoupling,
-                               eps = self.eps,
-                               kA = self.KVOL)
-                MC = copy.copy(self.Mc.flatten())
-                MCcpp = MC.ctypes.data_as(POINTER(c_double))
-                for i in range(MC.shape[0]):
-                    MCcpp[i] = MC[i]
-
-                Q0 = copy.copy(self.q0)
-                Q0cpp = Q0.ctypes.data_as(POINTER(c_double))
-                for i in range(Q0.shape[0]):
-                    Q0cpp[i] = Q0[i]
-                self.Adress = self.lib.CreateSystem(Arraycpp, MCcpp,Q0cpp,self.Lx,self.Ly)
-            else :
-                self.Adress=self.lib.CreateSystem(Arraycpp,self.Lx,self.Ly,self.eps,self.Kmain,self.Kcoupling,self.KVOL)
+            self.Adress = self.lib.CreateSystem(
+                Arraycpp, self.Lx, self.Ly, self.eps, self.Kmain, self.Kcoupling, self.KVOL)
             self.Energy = self.lib.GetSystemEnergy(self.Adress)
             print('create a new system')
         else:
-
             self.lib.UpdateSystemEnergy(
                 self.Adress, Arraycpp, self.Lx, self.Ly)
             self.Energy = self.lib.GetSystemEnergy(self.Adress)
@@ -438,7 +351,7 @@ class System:
             print("can t output an empty system")
             return 0.
         self.lib.OutputSystemSpring(self.Adress, Name.encode('utf-8'))
-    def PlotPerSite(self, figuresize=(7, 5), Zoom=1.,Fill=True,FillColor='stress',FIGAX=None,ec=(0,0,0,1),Edge=True):
+    def PlotPerSite(self, figuresize=(7, 5), Zoom=1.):
         # this one has a trick, it only 'works' on UNIX system and
         # it requires to be autorized to edit and delete file. The
         # idea is to use the function  in  order  to  PrintPersite
@@ -448,34 +361,21 @@ class System:
             print("can t output an empty system")
             return 0.
         # Directly plot the whole system as patches of polygon, it just require to save a file that it will delete
-        if FIGAX:
-            fig,ax = FIGAX
-        else:
-            fig, ax = plt.subplots(figsize=figuresize)
+        fig, ax = plt.subplots(figsize=figuresize)
         self.PrintPerSite('ToPlot.txt')
         Data = np.loadtxt('ToPlot.txt', dtype=float)
         os.system('rm -rf ToPlot.txt')
         XC, YC = 0, 0
         if type(Data[0]) != np.ndarray:
             Data = np.array([Data])
-        Hex=list()
-        C = list()
         for ligne in Data:
             XY = []
-            for i in range((ligne.shape[0]-1) // 2):
+            for i in range(ligne.shape[0] // 2):
                 XY.append([ligne[2 * i], ligne[2 * i + 1]])
             XC += sum(np.transpose(XY)[0]) / len(XY)
             YC += sum(np.transpose(XY)[1]) / len(XY)
-            Color = ligne[-1]
-            Hex.append(XY)
-            C.append(Color)
-        C = (np.array(C)/max(C)-0.5)*2
-        for n,XY in enumerate(Hex):
-            if FillColor == 'plain':
-                ax.add_patch(Polygon(XY, closed=True, linewidth=0.8, fill=Fill, fc=(
-                    0.41, 0.83, 0.94, 0.5), ec=(0, 0, 0, 1), ls='-', zorder=0))
-            else:# C = 'stress':
-                ax.add_patch(Polygon(XY, closed=True, linewidth=0.8, fill=Fill, fc=cm(C[n]), ec=ec, ls='-', zorder=0))
+            ax.add_patch(Polygon(XY, closed=True, linewidth=0.8, fill=True, fc=(
+                0.41, 0.83, 0.94, 0.5), ec=(0, 0, 0, 1), ls='-', zorder=0))
         ax.set_aspect(aspect=1.)
         ax.set_xlim([XC / Data.shape[0] - 1 / Zoom * np.sqrt(Data.shape[0]),
                      XC / Data.shape[0] + 1 / Zoom * np.sqrt(Data.shape[0])])
@@ -483,28 +383,6 @@ class System:
                      YC / Data.shape[0] + 1 / Zoom * np.sqrt(Data.shape[0])])
 
         # plt.show()
-        if Edge:
-            edges=list()
-            #----------Make a list with all the edge in my system---------
-            for ligne in Data:
-                PointsX=[truncate(ligne[2*i],3) for i in range(ligne.__len__()//2)]
-                PointsY=[truncate(ligne[2*i+1],3) for i in range(ligne.__len__()//2)]
-                Points=list(zip(PointsX,PointsY))
-                for i in range(Points.__len__()):
-                    if self.ParticleType=='Triangle':
-                        edges.append(sorted([Points[i],Points[(i+1)%3]]))
-                    elif self.ParticleType=='Hexagon':
-                        edges.append(sorted([Points[i],Points[(i+1)%6]]))
-            #----------Convert this list into a dictionnary which value is the number of appearance
-            unique, counts = np.unique(edges, return_counts=True,axis=0)
-            FreeEdgeIndex=np.where(counts==1)
-            for n,index in enumerate(FreeEdgeIndex[0]):
-                X , Y =list(),list()
-                for Points in unique[index]:
-                    X.append(Points[0])
-                    Y.append(Points[1])
-                ax.add_line(mlines.Line2D(X,Y,color=(231./255.,81./255.,19./255.),linewidth=3.))
-        plt.show()
         return fig, ax
     def PlotSiteStress(self,figuresize=(7,5),Zoom = 1.,Cmax=None):
         fig, ax = plt.subplots(figsize=figuresize)
@@ -532,7 +410,7 @@ class System:
             C = (np.asarray(C)/Cmax-0.5)*2
         else:
             #print(max(C))
-            C = (C/max(C))
+            C = (C/max(C)-0.5)*2
         for n,XY in enumerate(Hex):
             ax.add_patch(Polygon(XY, closed=True, linewidth=0.8, fill=True, fc=cm(C[n]),
             ec=(0, 0, 0, 1), ls='-', zorder=0))
@@ -565,7 +443,7 @@ class System:
         if type(Data[0]) != np.ndarray:
             Data = np.array([Data])
         for ligne in Data:
-            if True:#ligne[5]>0.8:
+            if ligne[5]>0.8:
                 X1 = np.append(X1, ligne[0])
                 Y1 = np.append(Y1, ligne[1])
                 X2 = np.append(X2, ligne[2])
@@ -576,20 +454,20 @@ class System:
         # Colorlim=(min(C0),max(C0))
         #Colorlim = (min(((C1 - C0) / (C0))), max(((C1 - C0) / (C0))))
         # if eps != 0:
-        #Colorlim = (0,0.1)
+        #    Colorlim = (0,eps)
         XC = sum(X1) / X1.shape[0]
         YC = sum(Y1) / Y1.shape[0]
 
-        self.MAP=cm2
+        # self.MAP=cm
         ax.set_xlim([XC - 1 / Zoom * np.sqrt(Data.shape[0] / 12.),
                      XC + 1 / Zoom * np.sqrt(Data.shape[0] / 12.)])
         ax.set_ylim([YC - 1 / Zoom * np.sqrt(Data.shape[0] / 12.),
                      YC + 1 / Zoom * np.sqrt(Data.shape[0] / 12.)])
-        plot = ax.quiver(X1, Y1, X2 - X1, Y2 - Y1, (C0-C1+1)/2,
-                         scale=1.0, angles='xy', scale_units='xy', width=0.003, minlength=0., headlength=0.,
+        plot = ax.quiver(X1, Y1, X2 - X1, Y2 - Y1, abs(C0-C1),
+                         scale=1.0, angles='xy', scale_units='xy', width=0.006, minlength=0., headlength=0.,
                          headaxislength=0., headwidth=0., alpha=1, edgecolor='k', cmap=self.MAP)#, clim=Colorlim)
         # if eps != 0:
-        #plot.set_clim((0.,0.005))
+        plot.set_clim((0,0.005))
         if Colorbar:
             fig.colorbar(plot, ax=ax)
         ax.set_aspect(aspect=1.)
@@ -605,10 +483,3 @@ class System:
             self.Np = dict(zip(unique, counts))[1]
         except:
             self.Np = 0
-    def Extension(self,ax):
-        if any([s==0 for S in self.state for s in S]):
-            print('the system isn t full of particle, we can t apply any deformation')
-            raise ValueError
-        return self.lib.Extension(self.Adress,ax)
-    def AffineDeformation(self, deformation_x = 0, deformation_y = 0):
-        return self.lib.AffineDeformation(self.Adress,deformation_x,deformation_y)

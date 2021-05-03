@@ -36,7 +36,8 @@ for S in range(NRepetition):
                                 SimNum=S,
                                 Path='Res/Serie'+str(SerieNum)+'/N_'+str(N),
                                 TimeStepTot=TimeStepTot,
-                                Seed=seed,
-                                ParticleType=ParticleType)
+                                Seed=Seed,
+                                ParticleType=ParticleType,
+                                Expansion = Expansion)
         with open('Res/Serie'+str(SerieNum)+'/Energy.out', 'a') as myfile:
             myfile.write(str(N)+' '+str(Energy)+' '+str(Statfinal)+'\n')

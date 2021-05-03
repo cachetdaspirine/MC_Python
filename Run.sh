@@ -10,3 +10,11 @@ cp Parameter.py "Res/Serie$SerieNum/Parameter.py"
 
 ./AnnealingLoop.py  $SerieNum
 #sbatch MonoAggregateAnnealing.pbs $SerieNum
+
+#for SimNum in {0..5}
+#do
+#	rm -rf "Res/Serie$SimNum"
+#	mkdir "Res/Serie$SimNum"
+#	sed "3s/.*/SimNum =+$SimNum/" Parameter.py > Res/Serie$SimNum/Parameter.py
+#	sbatch CanonicalAnnealing.pbs $SimNum
+#done
