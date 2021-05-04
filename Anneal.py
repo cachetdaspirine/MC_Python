@@ -116,6 +116,7 @@ def Annealing(
         #------Make the stats and adapt the McMove--------
         if t%StatTime==0:
             print("time=",t)
+            system.PrintPerSite(Path+'Sim'+str(SimNum)+'_Site_Time'+str(t)+'.res')
             MC.MakeStat(t,Beta)
             with open(Path+'/Sim'+str(SimNum)+'_Energy.out','a') as myfile:
                 myfile.write(str(t)+
