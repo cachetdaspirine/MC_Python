@@ -116,7 +116,7 @@ def Annealing(
         #------Make the stats and adapt the McMove--------
         if t%StatTime==0:
             print("time=",t)
-            system.PrintPerSite(Path+'Sim'+str(SimNum)+'_Site_Time'+str(t)+'.res')
+            system.PrintPerSite(Path+'/Sim'+str(SimNum)+'_Site_Time'+str(t)+'.res')
             MC.MakeStat(t,Beta)
             with open(Path+'/Sim'+str(SimNum)+'_Energy.out','a') as myfile:
                 myfile.write(str(t)+
@@ -128,7 +128,8 @@ def Annealing(
                              str((system.Energy+J*BinSyst.GetSurface())/system.Np)+
                              "\n")
     system.PrintPerSite(Path+'/Sim'+str(SimNum)+'_Site_Final.res')
-    system.PlotPerSite()
+    np.save(Path+'/Sim'+str(SimNum)+'State_Final.res',system.State,allow_pickle=True)
+    #system.PlotPerSite()
     #system.PrintPerSpring(Path+'/Sim'+str(SimNum)+'_Spring_Final.res')
     #system.PrintSpringPerSite(Path+'/Sim'+str(SimNum)+'_SpringSite_Final.res')
     return (system.Energy+J*BinSyst.GetSurface())/system.Np, MC.AcceptanceRate
