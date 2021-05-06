@@ -128,7 +128,7 @@ def Annealing(
                              str((system.Energy+J*BinSyst.GetSurface())/system.Np)+
                              "\n")
     system.PrintPerSite(Path+'/Sim'+str(SimNum)+'_Site_Final.res')
-    np.save(Path+'/Sim'+str(SimNum)+'State_Final.res',system.State,allow_pickle=True)
+    np.save(Path+'/Sim'+str(SimNum)+'State_Final.res',system.state,allow_pickle=True)
     #system.PlotPerSite()
     #system.PrintPerSpring(Path+'/Sim'+str(SimNum)+'_Spring_Final.res')
     #system.PrintSpringPerSite(Path+'/Sim'+str(SimNum)+'_SpringSite_Final.res')
