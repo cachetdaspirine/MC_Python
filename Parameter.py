@@ -1,6 +1,6 @@
 import Conversion as Conv
 
-SimNum = 
+SimNum =1
 
 numin = 0.4
 numax = 0.9
@@ -12,7 +12,7 @@ GammaMax = 0.8
 Gamma = GammaMin + (SimNum-SimMin)*(GammaMax-GammaMin)/(SimMax-SimMin)
 #nu = numin + SimNum*(numax-numin)/MaxSim
 
-P = Conv.AnalyticToSimul(Gamma = Gamma, nu = 0.4, l = 5., epsilon= 0.01,writting= False,ParticleType='Hexagon')
+P = Conv.AnalyticToSimul(Gamma = Gamma, nu = 0.9, l = 5., epsilon= 0.01,writting= False,ParticleType='Triangle')
 #  ____                  _
 # / ___|   _   _   ___  | |_    ___   _ __ ___
 # \___ \  | | | | / __| | __|  / _ \ | '_ ` _ \
@@ -32,7 +32,7 @@ SizeY=35
 Npmax=200
 Npmin=200
 NRepetition=1
-Expansion = True
+Expansion = False
 Output=True
 #  ____                                              _
 # |  _ \    __ _   _ __    __ _   _ __ ___     ___  | |_    ___   _ __   ___
@@ -40,7 +40,7 @@ Output=True
 # |  __/  | (_| | | |    | (_| | | | | | | | |  __/ | |_  |  __/ | |    \__ \
 # |_|      \__,_| |_|     \__,_| |_| |_| |_|  \___|  \__|  \___| |_|    |___/
 
-TimeStepTot=10000
+TimeStepTot=100
 StatTime=TimeStepTot//100
 
 

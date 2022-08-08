@@ -27,12 +27,11 @@ def Annealing(
         ):
     #os.system('rm -rf '+Path+'Sim'+str(SimNum))
     #os.system('mkdir '+Path+'Sim'+str(SimNum))
-
     with open(Path+'/Sim'+str(SimNum)+'_Energy.out','w') as myfile:
         myfile.write('time ElasticEnergy SurfaceEnergy TotalEnergy \n')
 
     StatTime=TimeStepTot//100
-    Shaking=NumberOfParticle**2
+    Shaking=10*NumberOfParticle
 
     with open(Path+'/Sim'+str(SimNum)+'_Parameter.out','w') as myfile:
         myfile.write('ParticleType '+ParticleType+'\n')

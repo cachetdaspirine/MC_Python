@@ -11,7 +11,7 @@ if len(sys.argv)<2:
     sys.exit()
 
 SerieNum=sys.argv[1]
-sys.path.insert(0,'Res/Serie'+str(SerieNum))
+#sys.path.insert(0,'Res/Serie'+str(SerieNum))
 from Parameter import *
 
 time_start = time.perf_counter()
