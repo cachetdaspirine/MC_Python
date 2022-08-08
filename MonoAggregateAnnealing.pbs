@@ -1,6 +1,6 @@
 #!/bin/bash
 #PBS -V
-#SBATCH --partition=qbigmem
+#SBATCH --partition=q-1sem
 #PBS -M hugo.le-roy@u-psud.fr
 #PBS -m bae
 

@@ -11,7 +11,7 @@
 #./AnnealingLoop.py  $SerieNum
 #sbatch MonoAggregateAnnealing.pbs $SerieNum
 
-for SimNum in {0..9}
+for SimNum in {0..4}
 do
 	rm -rf "Res/Serie$SimNum"
 	mkdir "Res/Serie$SimNum"
